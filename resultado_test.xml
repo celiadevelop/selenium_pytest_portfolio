@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="118.134" timestamp="2025-04-26T09:19:46.103219-04:00" hostname="Ce"><testcase classname="test_1_registro_usuario" name="test_registro_usuario" time="40.000" /><testcase classname="test_2_busqueda" name="test_busqueda_producto" time="25.649" /><testcase classname="test_3_accesibilidad_imagenes" name="test_imagenes_con_alt" time="16.544"><failure message="AssertionError: ⚠️ Se encontraron 1 imágenes sin atributo alt.&#10;assert 1 == 0&#10; +  where 1 = len([&lt;selenium.webdriver.remote.webelement.WebElement (session=&quot;acd8381798e6a2f818b82af8844c03bc&quot;, element=&quot;f.C7F239E22934FDC2308EFF2912927E71.d.E16DCEFF5B3E335889FF4DE5562E37F7.e.305&quot;)&gt;])">driver = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session="acd8381798e6a2f818b82af8844c03bc")&gt;
+
+    def test_imagenes_con_alt(driver):
+        # Abrir la web
+        driver.get("https://ecommerce-playground.lambdatest.io/")
+    
+        # Buscar todas las imágenes
+        imagenes = driver.find_elements(By.TAG_NAME, "img")
+    
+        # Verificar que cada imagen tiene atributo 'alt' no vacío
+        imagenes_sin_alt = []
+    
+        for img in imagenes:
+            alt_text = img.get_attribute("alt")
+            if alt_text is None or alt_text.strip() == "":
+                imagenes_sin_alt.append(img)
+    
+        # Assert final
+&gt;       assert len(imagenes_sin_alt) == 0, f"⚠️ Se encontraron {len(imagenes_sin_alt)} imágenes sin atributo alt."
+E       AssertionError: ⚠️ Se encontraron 1 imágenes sin atributo alt.
+E       assert 1 == 0
+E        +  where 1 = len([&lt;selenium.webdriver.remote.webelement.WebElement (session="acd8381798e6a2f818b82af8844c03bc", element="f.C7F239E22934FDC2308EFF2912927E71.d.E16DCEFF5B3E335889FF4DE5562E37F7.e.305")&gt;])
+
+test_3_accesibilidad_imagenes.py:28: AssertionError</failure></testcase><testcase classname="test_4_contraste_botones" name="test_contraste_en_botones" time="35.518"><failure message="AssertionError: ⚠️ Se encontraron 341 botones con bajo contraste.&#10;assert 341 == 0&#10; +  where 341 = len([&lt;selenium.webdriver.remote.webelement.WebElement (session=&quot;69cd62e085bbf3a8ddbb0b6eb1083ad9&quot;, element=&quot;f.A208F8227A72...bbf3a8ddbb0b6eb1083ad9&quot;, element=&quot;f.A208F8227A724A1470A9C8CB8FEE3C84.d.678B6FA46E53CD53FC3966B15D0EF5E6.e.1444&quot;)&gt;, ...])">driver = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session="69cd62e085bbf3a8ddbb0b6eb1083ad9")&gt;
+
+    def test_contraste_en_botones(driver):
+        # Abrir la web
+        driver.get("https://ecommerce-playground.lambdatest.io/")
+        time.sleep(2)  # Dar tiempo a que cargue
+    
+        # Buscar todos los botones principales
+        botones = driver.find_elements(By.TAG_NAME, "button")
+    
+        botones_fallidos = []
+    
+        for boton in botones:
+            color = boton.value_of_css_property("color")  # texto
+            background = boton.value_of_css_property("background-color")  # fondo
+    
+            # Extraer los valores rgb
+            color_rgb = [int(x) for x in color.replace('rgba(', '').replace('rgb(', '').replace(')', '').split(',')[:3]]
+            background_rgb = [int(x) for x in background.replace('rgba(', '').replace('rgb(', '').replace(')', '').split(',')[:3]]
+    
+            # Función rápida para calcular brillo relativo
+            def luminancia(rgb):
+                r, g, b = [x/255.0 for x in rgb]
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    
+            luminancia_texto = luminancia(color_rgb)
+            luminancia_fondo = luminancia(background_rgb)
+    
+            # Calcular ratio de contraste
+            contraste = (luminancia_fondo + 0.05) / (luminancia_texto + 0.05)
+            if contraste &lt; 1:
+                contraste = 1 / contraste
+    
+            # Según WCAG AA normal debe ser mínimo 4.5:1
+            if contraste &lt; 4.5:
+                botones_fallidos.append(boton)
+    
+&gt;       assert len(botones_fallidos) == 0, f"⚠️ Se encontraron {len(botones_fallidos)} botones con bajo contraste."
+E       AssertionError: ⚠️ Se encontraron 341 botones con bajo contraste.
+E       assert 341 == 0
+E        +  where 341 = len([&lt;selenium.webdriver.remote.webelement.WebElement (session="69cd62e085bbf3a8ddbb0b6eb1083ad9", element="f.A208F8227A72...bbf3a8ddbb0b6eb1083ad9", element="f.A208F8227A724A1470A9C8CB8FEE3C84.d.678B6FA46E53CD53FC3966B15D0EF5E6.e.1444")&gt;, ...])
+
+test_4_contraste_botones.py:48: AssertionError</failure></testcase></testsuite></testsuites>
